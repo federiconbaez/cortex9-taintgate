@@ -1,0 +1,78 @@
+# Demo policy: fronts all three mock worlds. Command placeholders are filled
+# by `taintgate-bench` / the README examples.
+[gateway]
+mode = "block"
+require_untrusted = true
+untrusted_destination = true
+unknown_tool = "sink"
+ngram = 16
+min_atom = 6
+proper_nouns = true
+accumulate = true
+
+[[server]]
+name = "bank"
+command = ["taintgate-world", "--suite", "scenarios/world-banking.json"]
+
+[[server]]
+name = "ws"
+command = ["taintgate-world", "--suite", "scenarios/world-workspace.json"]
+
+[[server]]
+name = "slack"
+command = ["taintgate-world", "--suite", "scenarios/world-slack.json"]
+
+[[tool]]
+match = "bank/get_transactions"
+source = ["private", "untrusted"]
+[[tool]]
+match = "bank/get_balance"
+source = ["private"]
+[[tool]]
+match = "bank/read_invoice_file"
+source = ["untrusted"]
+[[tool]]
+match = "bank/send_money"
+sink = true
+destination = ["recipient"]
+trusted = ["DE89370400440532013000"]
+[[tool]]
+match = "bank/update_scheduled_transaction"
+sink = true
+destination = ["recipient"]
+trusted = ["DE89370400440532013000"]
+[[tool]]
+match = "ws/read_inbox"
+source = ["private", "untrusted"]
+[[tool]]
+match = "ws/read_document"
+source = ["private", "untrusted"]
+[[tool]]
+match = "ws/get_security_code"
+source = ["private"]
+[[tool]]
+match = "ws/send_email"
+sink = true
+destination = ["recipients"]
+trusted = ["*@acme-corp.example"]
+[[tool]]
+match = "ws/create_calendar_event"
+sink = true
+destination = ["participants"]
+trusted = ["*@acme-corp.example"]
+[[tool]]
+match = "slack/read_channel_messages"
+source = ["untrusted"]
+[[tool]]
+match = "slack/read_user_profile"
+source = ["private"]
+[[tool]]
+match = "slack/post_webpage"
+sink = true
+url_destination = ["url"]
+trusted = ["*.acme-corp.example", "docs.acme-corp.example"]
+[[tool]]
+match = "slack/send_direct_message"
+sink = true
+destination = ["recipient"]
+trusted = ["alice", "bob", "carla"]

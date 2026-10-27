@@ -1,0 +1,23 @@
+# Minimal policy that fronts a single stdio MCP server.
+[gateway]
+mode = "block"
+require_untrusted = true
+untrusted_destination = true
+
+[[server]]
+name = "app"
+command = ["taintgate-world", "--suite", "scenarios/world-banking.json"]
+
+[[tool]]
+match = "app/get_balance"
+source = ["private"]
+
+[[tool]]
+match = "app/read_invoice_file"
+source = ["untrusted"]
+
+[[tool]]
+match = "app/send_money"
+sink = true
+destination = ["recipient"]
+trusted = ["DE89370400440532013000"]

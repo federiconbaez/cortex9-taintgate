@@ -1,0 +1,37 @@
+[gateway]
+mode = "block"
+require_untrusted = true
+untrusted_destination = true
+unknown_tool = "sink"
+ngram = 16
+min_atom = 6
+proper_nouns = true
+accumulate = true
+
+[[server]]
+name = "ws"
+command = ["PLACEHOLDER"]
+
+[[tool]]
+match = "ws/read_inbox"
+source = ["private", "untrusted"]
+
+[[tool]]
+match = "ws/read_document"
+source = ["private", "untrusted"]
+
+[[tool]]
+match = "ws/get_security_code"
+source = ["private"]
+
+[[tool]]
+match = "ws/send_email"
+sink = true
+destination = ["recipients"]
+trusted = ["*@acme-corp.example"]
+
+[[tool]]
+match = "ws/create_calendar_event"
+sink = true
+destination = ["participants"]
+trusted = ["*@acme-corp.example"]

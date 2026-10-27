@@ -1,0 +1,39 @@
+# Policy for the banking scenario suite.
+[gateway]
+mode = "block"
+require_untrusted = true
+untrusted_destination = true
+unknown_tool = "sink"
+ngram = 16
+min_ngram_hits = 1
+min_atom = 6
+proper_nouns = true
+accumulate = true
+
+[[server]]
+name = "bank"
+command = ["PLACEHOLDER"]
+
+[[tool]]
+match = "bank/get_transactions"
+source = ["private", "untrusted"]
+
+[[tool]]
+match = "bank/get_balance"
+source = ["private"]
+
+[[tool]]
+match = "bank/read_invoice_file"
+source = ["untrusted"]
+
+[[tool]]
+match = "bank/send_money"
+sink = true
+destination = ["recipient"]
+trusted = ["DE89370400440532013000"]
+
+[[tool]]
+match = "bank/update_scheduled_transaction"
+sink = true
+destination = ["recipient"]
+trusted = ["DE89370400440532013000"]

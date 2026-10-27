@@ -1,0 +1,33 @@
+[gateway]
+mode = "block"
+require_untrusted = true
+untrusted_destination = true
+unknown_tool = "sink"
+ngram = 16
+min_atom = 6
+proper_nouns = true
+accumulate = true
+
+[[server]]
+name = "slack"
+command = ["PLACEHOLDER"]
+
+[[tool]]
+match = "slack/read_channel_messages"
+source = ["untrusted"]
+
+[[tool]]
+match = "slack/read_user_profile"
+source = ["private"]
+
+[[tool]]
+match = "slack/post_webpage"
+sink = true
+url_destination = ["url"]
+trusted = ["*.acme-corp.example", "docs.acme-corp.example"]
+
+[[tool]]
+match = "slack/send_direct_message"
+sink = true
+destination = ["recipient"]
+trusted = ["alice", "bob", "carla"]
