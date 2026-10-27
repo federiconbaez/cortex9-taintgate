@@ -109,7 +109,17 @@ Resultado medido en esta máquina (x86_64, 2026-10-27), 32 escenarios (12 ataque
 
 La paráfrasis es la debilidad central: el matching de contenido no entiende reformulaciones. De los 3 escenarios de paráfrasis, 2 atravesaron el gateway; el que se atrapó (`evasion-paraphrase-address`) reutilizaba la palabra distintiva «Larch» del domicilio original, que el extractor de nombres propios había guardado como átomo. Eso no es comprensión semántica: es un resto léxico que sobrevivió a la reescritura.
 
-Los números del job `bench` en GitHub Actions se agregan al README después de la primera corrida (vía PR).
+Resultado del job `bench` en GitHub Actions ([run 40480538124](https://github.com/federiconbaez/cortex9-taintgate/actions/runs/40480538124), ubuntu-latest, 2026-10-27):
+
+| métrica | valor en CI |
+|---|---|
+| ataques baseline → taintgate | 12/12 → 0/12 (reducción 100 %) |
+| utilidad benigna | 100 % → 100 % (pérdida 0 pp) |
+| falsos positivos | 0 |
+| evasión mecánica | 8/8 → 0/8 |
+| evasión por paráfrasis | 3/3 → 2/3 (atrapó 33 %) |
+
+Sólo se midió en runners `ubuntu-latest` (x86_64).
 
 ### Qué no cubre
 
@@ -167,7 +177,7 @@ Measured on a development machine (x86_64, 2026-10-27), 32 scenarios (12 attack 
 
 Paraphrase is the central weakness of content matching. 2 of 3 paraphrase scenarios went through; the one that was caught still carried the distinctive word "Larch" from the original address, which the proper-noun atom extractor had stored. That is leftover lexicon, not semantic understanding.
 
-CI `bench` job numbers are added to this README after the first run (via PR).
+CI `bench` job result ([run 40480538124](https://github.com/federiconbaez/cortex9-taintgate/actions/runs/40480538124), ubuntu-latest, 2026-10-27): attacks 12/12 → 0/12 (100 % reduction), benign utility 100 % → 100 % (0 pp loss), 0 false positives, mechanical evasion 8/8 → 0/8, paraphrase evasion 3/3 → 2/3 (caught 33 %). Measured on `ubuntu-latest` x86_64 runners only.
 
 ### Limitations
 
