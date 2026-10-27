@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    name: fmt · clippy · test
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test
+        run: cargo test --workspace --all-targets --locked
+
+  bench:
+    name: scenario suite (acceptance)
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build release
+        run: cargo build --release --locked
+      - name: Run scenario suite
+        run: |
+          ./target/release/taintgate-bench \
+            --scenarios scenarios/traces.json \
+            --worlds scenarios \
+            --policies policies \
+            --out bench-report.json
+          python3 - <<'PY'
+          import json, sys
+          r = json.load(open("bench-report.json"))
+          a = r["acceptance"]
+          print(json.dumps(a, indent=2))
+          print(json.dumps(r["evasion"], indent=2))
+          ok = a["reduction_met"] and a["utility_met"]
+          # Paraphrase evasion is measured and reported; it is NOT a gate for CI.
+          sys.exit(0 if ok else 1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bench-report
+          path: bench-report.json
+          if-no-files-found: error
